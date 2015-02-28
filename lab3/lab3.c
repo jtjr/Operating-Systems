@@ -29,7 +29,7 @@ int doFib(int n, int doPrint)
     if (pid2 == 0)
     {
         
-        exit(doFib(n-2, 1));
+        exit(doFib(n-2, 0));
     }
     
     if(pid1 > 0)
@@ -58,7 +58,7 @@ int doFib(int n, int doPrint)
     }
     else
 	{
-		return 0;
+		return print;
 	}
 }
 int main(){
