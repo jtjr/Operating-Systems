@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <ctype.h>
 
-void doFib(int n, int doPrint)
+int doFib(int n, int doPrint)
 {
     int status;
     int print;
@@ -14,22 +14,22 @@ void doFib(int n, int doPrint)
     int sum2 = 0;
 
     if (n < 2)
-        exit(n);
+        return(n);
 
     pid1 = fork();
 
     if (pid1 == 0)
     {
-        doFib(n-1, doPrint);
-        exit(n-1);
+        
+        exit(doFib(n-1, 1));
     }
 
     pid2 = fork();
 
     if (pid2 == 0)
     {
-        doFib(n-2, doPrint);
-        exit(n-2);
+        
+        exit(doFib(n-2, 1));
     }
     
     if(pid1 > 0)
@@ -37,7 +37,7 @@ void doFib(int n, int doPrint)
 		waitpid(pid1,&status,0);
 		if(WIFEXITED(status))
 		{
-			sum1 = WEXITSTATUS(status);
+			sum1 += WEXITSTATUS(status);
 		}
 	}
 	
@@ -46,20 +46,25 @@ void doFib(int n, int doPrint)
 		waitpid(pid2,&status,0);
 		if(WIFEXITED(status))
 		{
-			sum2 = WEXITSTATUS(status);
+			sum2 += WEXITSTATUS(status);
 		}
 	}
     print = sum1 + sum2;
 
     if(doPrint)
+    {
         printf("%d,", print);
+        return print;
+    }
     else
-        exit(0);
+	{
+		return 0;
+	}
 }
 int main(){
 	int n;
 	printf("Enter the number of a Fibonacci Sequence:\n");
 	scanf("%d", &n);
 	doFib(n,1);
-    	return 0;
+    return 0;
 }
