@@ -4,43 +4,67 @@
 #include <unistd.h>
 #include <ctype.h>
 
-int doFib(int n)
+int doFib(int n, int doPrint)
 {
-	if(n == 0)
-	{
-		return (0);
+    int status;
+    int print;
+    pid_t pid1;
+    pid_t pid2;
+    int sum1 = 0;
+    int sum2 = 0;
+
+    if (n < 2)
+        return(n);
+
+    pid1 = fork();
+
+    if (pid1 == 0)
+    {
+        
+        exit(doFib(n-1, 1));
+    }
+
+    pid2 = fork();
+
+    if (pid2 == 0)
+    {
+        
+        exit(doFib(n-2, 0));
+    }
+    
+    if(pid1 > 0)
+    {
+		waitpid(pid1,&status,0);
+		if(WIFEXITED(status))
+		{
+			sum1 += WEXITSTATUS(status);
+		}
 	}
-	else if(n == 1)
-	{
-		return (1);
+	
+	if(pid2 > 0)
+    {
+		waitpid(pid2,&status,0);
+		if(WIFEXITED(status))
+		{
+			sum2 += WEXITSTATUS(status);
+		}
 	}
-	else if(n > 1)
+    print = sum1 + sum2;
+
+    if(doPrint)
+    {
+        printf("%d,", print);
+        return print;
+    }
+    else
 	{
-		//return (doFib(n-1)+doFib(n-2));
+		return print;
 	}
-	pid_t pid1 = fork();
-	if(pid1 == 0)
-	{
-		exit(doFib(n-1));
-	}
-	pid_t pid2 = fork();
-	if(pid2 == 0)
-	{
-		exit(doFib(n-2));
-	}
-   	 else 
-    	{
-		int status1;
-		int status2;
-		waitpid(pid1,&status1,0);
-        	waitpid(pid2, &status2, 0);
-        	printf("Parent ends %d", (WEXITSTATUS(status1) + WEXITSTATUS(status2)));
-    	}
 }
 int main(){
 	int n;
 	printf("Enter the number of a Fibonacci Sequence:\n");
 	scanf("%d", &n);
-	doFib(n);
-    	return 0;
+	doFib(n,1);
+    return 0;
 }
