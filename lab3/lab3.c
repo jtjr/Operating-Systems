@@ -13,62 +13,63 @@ int doFib(int n, int doPrint)
     int sum1 = 0;
     int sum2 = 0;
 
-    if (n < 2)
+    if (n < 2 )
     {
 		if((n == 0) )
 		{
 			printf("0, ");
 		}
-		if((n == 1) & (doPrint))
+		if((n == 1))
 		{
 			printf("1, ");
 		}
         return(n);
 
 	}
-    pid1 = fork();
-
-    if (pid1 == 0)
-    {
-        
-        exit(doFib(n-1, 1));
-    }
-
-    pid2 = fork();
-
-    if (pid2 == 0)
-    {
-        
-        exit(doFib(n-2, 0));
-    }
-    
-    if(pid1 > 0)
-    {
-		waitpid(pid1,&status,0);
-		if(WIFEXITED(status))
-		{
-			sum1 += WEXITSTATUS(status);
-		}
-	}
-	
-	if(pid2 > 0)
-    {
-		waitpid(pid2,&status,0);
-		if(WIFEXITED(status))
-		{
-			sum2 += WEXITSTATUS(status);
-		}
-	}
-    print = sum1 + sum2;
-
-    if(doPrint)
-    {
-        printf("%d,", print);
-        return print;
-    }
-    else
+	else
 	{
-		return print;
+		pid1 = fork();
+
+		if (pid1 == 0)
+		{
+
+			
+			exit(doFib(n-1, 1));
+		}
+
+		pid2 = fork();
+
+		if (pid2 == 0)
+		{
+			
+			exit(doFib(n-2, 0));
+		}
+		
+		if(pid1 > 0)
+		{
+			waitpid(pid1,&status,0);
+			sum1 = WEXITSTATUS(status);
+			
+		}
+		
+		if(pid2 > 0)
+		{
+			waitpid(pid2,&status,0);
+			
+			sum2 = WEXITSTATUS(status);
+			
+		}
+		print = sum1 + sum2;
+
+		if(doPrint)
+		{
+			printf("%d,", print);
+			return print;
+		}
+		else
+		{
+			return print;
+		}
 	}
 }
 int main(){
