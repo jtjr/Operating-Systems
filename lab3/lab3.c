@@ -14,8 +14,18 @@ int doFib(int n, int doPrint)
     int sum2 = 0;
 
     if (n < 2)
+    {
+		if((n == 0) )
+		{
+			printf("0, ");
+		}
+		if((n == 1) & (doPrint))
+		{
+			printf("1, ");
+		}
         return(n);
 
+	}
     pid1 = fork();
 
     if (pid1 == 0)
