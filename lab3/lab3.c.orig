@@ -3,16 +3,22 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <stdbool.h>
 
-int doFib(int n, int doPrint)
-{
-    int status;
-    int print;
-    pid_t pid1;
-    pid_t pid2;
-    int sum1 = 0;
-    int sum2 = 0;
+int doFib(int n) {
 
+<<<<<<< HEAD
+  int pid1, pid2;
+  int status;
+  int val;
+  val = 0;
+
+  if (n<=1) // Base case for the recursion
+  {
+	  val = n;    
+  }
+  else {
+=======
     if (n < 2 )
     {
 		if((n == 0) )
@@ -24,12 +30,37 @@ int doFib(int n, int doPrint)
 			printf("1, ");
 		}
         return(n);
+>>>>>>> 421f730395a657d281b379a2c4d9bf99d964011e
 
 	}
 	else
 	{
 		pid1 = fork();
 
+<<<<<<< HEAD
+    if (pid1 == 0) {
+      exit(doFib(n-1));
+    }
+
+    else {              
+      waitpid(pid1,&status,0);
+      val = WEXITSTATUS(status);
+
+      pid2 = fork();
+
+      if (pid2 == 0) {
+        exit(doFib(n-2));
+      }
+
+      else {
+        waitpid(pid2,&status,0);
+      
+        val += WEXITSTATUS(status);
+      }
+    }
+  }
+    return(val);
+=======
 		if (pid1 == 0)
 		{
 
@@ -71,11 +102,23 @@ int doFib(int n, int doPrint)
 			return print;
 		}
 	}
+>>>>>>> 421f730395a657d281b379a2c4d9bf99d964011e
 }
+
 int main(){
-	int n;
+	int n,k,printVal;
 	printf("Enter the number of a Fibonacci Sequence:\n");
 	scanf("%d", &n);
-	doFib(n,1);
+	k = n;
+	while( k >= 0)
+	{
+
+			printVal = doFib(k);
+			
+			printf("\n%d.) %d",k,printVal);
+		k--;
+	}
+    
+    
     return 0;
 }
