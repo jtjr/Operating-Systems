@@ -58,22 +58,28 @@ void initialize_allocation(){
 }
 
 void *customer(int *param){
-	sleep(rand() % 3);
-	pthread_mutex_lock(&mutex);
-	printf("customer %3d ", *param);
-	int request1 = rand()%resources1;
-	int request2 = rand()%resources2;
-	int request3 = rand()%resources3;
-	printf("requests %3d %3d %3d\n",request1,request2,request3);
-	if(request1 <= resources1 && request2 <= resources2 && request3 <= resources3)
-	{
-		printf("works\n");
-		allocation[*param][0]=request1;
-		allocation[*param][1]=request2;
-		allocation[*param][2]=request3;
-	}
-	sleep(1);
-	pthread_mutex_unlock(&mutex);
+	int i = 0;
+	while(i<3){
+		sleep(rand() % 3);
+		pthread_mutex_lock(&mutex);
+		printf("customer %3d ", *param);
+		int request1 = rand()%resources1;
+		int request2 = rand()%resources2;
+		int request3 = rand()%resources3;
+		//printf("requests %3d %3d %3d\n",request1,request2,request3);
+		request_resources(param,request1,request2,request3);
+		i++;
+		pthread_mutex_unlock(&mutex);
 	//pthread_exit(0);
+	}
+}
+int request_resources(int *customer_num, int request1,int request2,int request3){
+	printf("Customer %3d ", *customer_num);
+	printf("wants %3d %3d %3d\n", request1,request2,request3);
+	if(request1 <= resources1 && request2 <= resources2 && request3 <= resources3){
+		printf("Banker grants the resources");
+		
+	}
+	//exit(0);
 }
 
