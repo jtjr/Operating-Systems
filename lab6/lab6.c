@@ -75,7 +75,7 @@ void *customer(int *param){
 		pthread_mutex_unlock(&mutex);
 	//pthread_exit(0);
 	}
-	release_resources(param);
+	//release_resources(param);
 }
 int request_resources(int *customer_num, int request1,int request2,int request3){
 	
@@ -83,9 +83,7 @@ int request_resources(int *customer_num, int request1,int request2,int request3)
 	printf("\n\t\tMax is  %3d  %3d  %3d", maximum[*customer_num][0],maximum[*customer_num][1],maximum[*customer_num][2]);
 	printf("\n\t\twants   %3d  %3d  %3d", request1,request2,request3);
 	
-	allocation[*customer_num][0] = request1;
-	allocation[*customer_num][1] = request2;
-	allocation[*customer_num][2] = request3;
+
 	need[*customer_num][0] = maximum[*customer_num][0]-allocation[*customer_num][0];
 	need[*customer_num][1] = maximum[*customer_num][1]-allocation[*customer_num][1];
 	need[*customer_num][2] = maximum[*customer_num][2]-allocation[*customer_num][2];
@@ -103,16 +101,19 @@ int request_resources(int *customer_num, int request1,int request2,int request3)
 	* */
 	
 	if(request1 <= available[0] && request2 <= available[0] && request3 <= available[0]){
-		if(need[*customer_num][0] >= 0 &&need[*customer_num][1] >= 0 && need[*customer_num][2]  >= 0){
+		if(request1 <= need[*customer_num][0] && request2 <= need[*customer_num][1] && request3 <= need[*customer_num][2]){
 			printf("\n\n\nBanker grants the resources\n\n");
+			available[0] -= request1;
+			available[1] -= request2;
+			available[2] -= request3;
+			allocation[*customer_num][0] += request1;
+			allocation[*customer_num][1] += request2;
+			allocation[*customer_num][2] += request3;	
+			need[*customer_num][0] -= request1;
+			need[*customer_num][1] -= request2;
+			need[*customer_num][2] -= request3;
 		}
 		else{
-		allocation[*customer_num][0] = 0;
-		allocation[*customer_num][1] = 0;
-		allocation[*customer_num][2] = 0;		
-		need[*customer_num][0] = maximum[*customer_num][0]+allocation[*customer_num][0];
-		need[*customer_num][1] = maximum[*customer_num][1]+allocation[*customer_num][1];
-		need[*customer_num][2] = maximum[*customer_num][2]+allocation[*customer_num][2];
 		printf("\n\n\n***************fail***************\n\n\n");
 	}
 	}
