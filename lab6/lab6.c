@@ -31,6 +31,9 @@ int need[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES];
 int resources1;
 int resources2;
 int resources3;
+int request1;
+int request2;
+int request3;
 pthread_mutex_t mutex;
 void *customer(int *param);
 void printMatrices();
@@ -92,6 +95,9 @@ void *customer(int *param){
 	release_resources(param);
 }
 int request_resources(int *customer_num, int request1,int request2,int request3){
+	need[*customer_num][0] = maximum[*customer_num][0]-allocation[*customer_num][0];
+	need[*customer_num][1] = maximum[*customer_num][1]-allocation[*customer_num][1];
+	need[*customer_num][2] = maximum[*customer_num][2]-allocation[*customer_num][2];
 	
 	printf("\n\tCustomer %3d ", *customer_num);
 	printf("\n\t\tMax is  %3d  %3d  %3d", maximum[*customer_num][0],maximum[*customer_num][1],maximum[*customer_num][2]);
