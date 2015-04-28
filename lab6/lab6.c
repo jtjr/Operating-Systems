@@ -18,6 +18,7 @@ int resources2;
 int resources3;
 pthread_mutex_t mutex;
 void *customer(int *param);
+void printMatrices();
 
 int main(int argc, char *argv[]){
 	srand (time(NULL));
@@ -63,11 +64,12 @@ void *customer(int *param){
 	while(i<3){
 		sleep(rand() % 3);
 		pthread_mutex_lock(&mutex);
-		printf("\n\ncustomer %3d\n\n_________________________\n ", *param);
+		printf("\n\ncustomer %3d\n_________________________\n ", *param);
 		int request1 = rand()%resources1;
 		int request2 = rand()%resources2;
 		int request3 = rand()%resources3;
 		//printf("requests %3d %3d %3d\n",request1,request2,request3);
+		printMatrices();
 		request_resources(param,request1,request2,request3);
 		i++;
 		pthread_mutex_unlock(&mutex);
@@ -79,7 +81,7 @@ int request_resources(int *customer_num, int request1,int request2,int request3)
 	
 	printf("\n\tCustomer %3d ", *customer_num);
 	printf("\n\t\tMax is  %3d  %3d  %3d", maximum[*customer_num][0],maximum[*customer_num][1],maximum[*customer_num][2]);
-	printf("\n\t\twants   %3d  %3d  %3d\n", request1,request2,request3);
+	printf("\n\t\twants   %3d  %3d  %3d", request1,request2,request3);
 	
 	allocation[*customer_num][0] = request1;
 	allocation[*customer_num][1] = request2;
@@ -87,7 +89,7 @@ int request_resources(int *customer_num, int request1,int request2,int request3)
 	need[*customer_num][0] = maximum[*customer_num][0]-allocation[*customer_num][0];
 	need[*customer_num][1] = maximum[*customer_num][1]-allocation[*customer_num][1];
 	need[*customer_num][2] = maximum[*customer_num][2]-allocation[*customer_num][2];
-	printf("\t\tneed is %3d  %3d  %3d\n", need[*customer_num][0],need[*customer_num][1],need[*customer_num][2]);
+	printf("\n\t\tneed is %3d  %3d  %3d\n", need[*customer_num][0],need[*customer_num][1],need[*customer_num][2]);
 	/*if(need[*customer_num][0] <= available[0] &&need[*customer_num][1] <= available[1] && need[*customer_num][2] <= available[2]){
 		printf("\n\n\nBanker grants the resources\n\n\n");
 	}
@@ -102,31 +104,61 @@ int request_resources(int *customer_num, int request1,int request2,int request3)
 	
 	if(request1 <= available[0] && request2 <= available[0] && request3 <= available[0]){
 		if(need[*customer_num][0] >= 0 &&need[*customer_num][1] >= 0 && need[*customer_num][2]  >= 0){
-			
-			available[0] = need[*customer_num][0];
-			available[1] = need[*customer_num][1];
-			available[2] = need[*customer_num][2];
-			printf("\n\n\nBanker grants the resources\n\n\n");
+			printf("\n\n\nBanker grants the resources\n\n");
 		}
 	}
-	else
-	{
+	else{
+		allocation[*customer_num][0] -= request1;
+		allocation[*customer_num][1] -= request2;
+		allocation[*customer_num][2] -= request3;		
 		need[*customer_num][0] = maximum[*customer_num][0]+allocation[*customer_num][0];
 		need[*customer_num][1] = maximum[*customer_num][1]+allocation[*customer_num][1];
 		need[*customer_num][2] = maximum[*customer_num][2]+allocation[*customer_num][2];
-		printf("\n\n\n\n\n***************fail***************\n\n\n\n\n");
+		printf("\n\n\n***************fail***************\n\n\n");
 	}
 	//exit(0);
 }
 
 int release_resources(int *customer_num)
 {
-	available[0] += need[*customer_num][0];
-	available[1] += need[*customer_num][1];
-	available[2] += need[*customer_num][2];
+	allocation[*customer_num][0] -= need[*customer_num][0];
+	allocation[*customer_num][1] -= need[*customer_num][1];
+	allocation[*customer_num][2] -= need[*customer_num][2];
 	
 	need[*customer_num][0] = 0;
 	need[*customer_num][1] = 0;
 	need[*customer_num][2] = 0;
+}
+
+void printMatrices()
+{
+	int k,m;
+	printf("ALLOCATION\n");
+	for(k = 0; k < 5; k++)
+	{
+		for(m = 0; m < 3; m++)
+		{
+			printf("%2d",allocation[k][m]);
+		}
+		printf("\n");
+	}
+	printf("NEED\n");
+	for(k = 0; k < 5; k++)
+	{
+		for(m = 0; m < 3; m++)
+		{
+			printf("%2d",need[k][m]);
+		}
+		printf("\n");
+	}
+	printf("MAX\n");
+	for(k = 0; k < 5; k++)
+	{
+		for(m = 0; m < 3; m++)
+		{
+			printf("%2d",maximum[k][m]);
+		}
+		printf("\n");
+	}
 }
 
