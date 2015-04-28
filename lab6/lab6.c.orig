@@ -83,11 +83,18 @@ void *customer(int *param){
 	while(i<3){
 		sleep(rand() % 3);
 		pthread_mutex_lock(&mutex);
+<<<<<<< HEAD
 		printf("\ncustomer %3d\n_________________________\n ", *param);
 		int request1 = rand()%((int)maximum[*param][0]+1);
 		int request2 = rand()%((int)maximum[*param][1]+1);
 		int request3 = rand()%((int)maximum[*param][2]+1);
 		printMatrices();
+=======
+		printf("customer %3d ", *param);
+		request1 = rand()%resources1;
+		request2 = rand()%resources2;
+		request3 = rand()%resources3;
+>>>>>>> 4cee1a5db1adf9107b6746301ad386abb9952112
 		request_resources(param,request1,request2,request3);
 		i++;
 		pthread_mutex_unlock(&mutex);
@@ -95,6 +102,7 @@ void *customer(int *param){
 	release_resources(param);
 }
 int request_resources(int *customer_num, int request1,int request2,int request3){
+<<<<<<< HEAD
 	
 	printf("\n\tCustomer %3d ", *customer_num);
 	printf("\n\t\tMax is  %3d  %3d  %3d", maximum[*customer_num][0],maximum[*customer_num][1],maximum[*customer_num][2]);
@@ -128,7 +136,10 @@ int request_resources(int *customer_num, int request1,int request2,int request3)
 			}
 		}
 	
-	else{	
+	else{
+		allocation[*customer_num][0] = 0;
+		allocation[*customer_num][1] = 0;
+		allocation[*customer_num][2] = 0;		
 		need[*customer_num][0] = maximum[*customer_num][0]+allocation[*customer_num][0];
 		need[*customer_num][1] = maximum[*customer_num][1]+allocation[*customer_num][1];
 		need[*customer_num][2] = maximum[*customer_num][2]+allocation[*customer_num][2];
@@ -233,5 +244,38 @@ int checkSafety()
 		}
 	}
 	return(boolean);
+=======
+	need[*customer_num][0] = maximum[*customer_num][0]-allocation[*customer_num][0];
+	need[*customer_num][1] = maximum[*customer_num][1]-allocation[*customer_num][1];
+	need[*customer_num][2] = maximum[*customer_num][2]-allocation[*customer_num][2];
+	printf("Customer %3d ", *customer_num);
+	printf("wants %3d %3d %3d\n", request1,request2,request3);
+	if(request1 <= need[*customer_num][0]&&request2 <= need[*customer_num][1]&&request3 <= need[*customer_num][2]){
+		if(request1 <= available[0] && request2 <= available[1] && request3 <= available[2]){
+			available[0] = available[0] - request1;
+			available[1] = available[1] - request2;
+			available[2] = available[2] - request3;
+			allocation[*customer_num][0]=allocation[*customer_num][0]+request1;
+			allocation[*customer_num][1]=allocation[*customer_num][1]+request2;
+			allocation[*customer_num][2]=allocation[*customer_num][2]+request3;
+			need[*customer_num][0]=need[*customer_num][0]-request1;
+			need[*customer_num][1]=need[*customer_num][1]-request2;
+			need[*customer_num][2]=need[*customer_num][2]-request3;
+		}
+	}
+	else{
+		printf("fail claim has exceeded maximum\n");
+	}
+		/*if(need[*customer_num][0] <= 0 && need[*customer_num][1] <= 0 && need[*customer_num][2] <= 0){
+			printf("thread completed YAY\n");
+			available[0] += allocation[*customer_num][0];
+			available[1] += allocation[*customer_num][1];
+			available[2] += allocation[*customer_num][2];
+			allocation[*customer_num][0] = 0;
+			allocation[*customer_num][1] = 0;
+			allocation[*customer_num][2] = 0;
+		}
+	}*/
+>>>>>>> 4cee1a5db1adf9107b6746301ad386abb9952112
 }
 
