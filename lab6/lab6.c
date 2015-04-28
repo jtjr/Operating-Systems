@@ -40,6 +40,7 @@ int main(int argc, char *argv[]){
 		maximum[k][2] = rand()%resources3;
 		printf("Maximum %3d %3d %3d \n",maximum[k][0],maximum[k][1],maximum[k][2]);
 	}
+	printf("\n\n");
 	int i,j,z,l,a;
 	i=0;j=1;z=2;l=3;a=4;
 	pthread_create(&customers[0],NULL,(void *)customer,(int *)&i);
@@ -62,7 +63,7 @@ void *customer(int *param){
 	while(i<3){
 		sleep(rand() % 3);
 		pthread_mutex_lock(&mutex);
-		printf("customer %3d ", *param);
+		printf("\n\ncustomer %3d\n\n_________________________\n ", *param);
 		int request1 = rand()%resources1;
 		int request2 = rand()%resources2;
 		int request3 = rand()%resources3;
@@ -72,14 +73,60 @@ void *customer(int *param){
 		pthread_mutex_unlock(&mutex);
 	//pthread_exit(0);
 	}
+	release_resources(param);
 }
 int request_resources(int *customer_num, int request1,int request2,int request3){
-	printf("Customer %3d ", *customer_num);
-	printf("wants %3d %3d %3d\n", request1,request2,request3);
-	if(request1 <= resources1 && request2 <= resources2 && request3 <= resources3){
-		printf("Banker grants the resources");
-		
+	
+	printf("\n\tCustomer %3d ", *customer_num);
+	printf("\n\t\tMax is  %3d  %3d  %3d", maximum[*customer_num][0],maximum[*customer_num][1],maximum[*customer_num][2]);
+	printf("\n\t\twants   %3d  %3d  %3d\n", request1,request2,request3);
+	
+	allocation[*customer_num][0] = request1;
+	allocation[*customer_num][1] = request2;
+	allocation[*customer_num][2] = request3;
+	need[*customer_num][0] = maximum[*customer_num][0]-allocation[*customer_num][0];
+	need[*customer_num][1] = maximum[*customer_num][1]-allocation[*customer_num][1];
+	need[*customer_num][2] = maximum[*customer_num][2]-allocation[*customer_num][2];
+	printf("\t\tneed is %3d  %3d  %3d\n", need[*customer_num][0],need[*customer_num][1],need[*customer_num][2]);
+	/*if(need[*customer_num][0] <= available[0] &&need[*customer_num][1] <= available[1] && need[*customer_num][2] <= available[2]){
+		printf("\n\n\nBanker grants the resources\n\n\n");
+	}
+	else
+	{
+		printf("\n\n\n\n\nfail");
+		need[*customer_num][0] = maximum[*customer_num][0]+allocation[*customer_num][0];
+		need[*customer_num][1] = maximum[*customer_num][1]+allocation[*customer_num][1];
+		need[*customer_num][2] = maximum[*customer_num][2]+allocation[*customer_num][2];
+	}
+	* */
+	
+	if(request1 <= available[0] && request2 <= available[0] && request3 <= available[0]){
+		if(need[*customer_num][0] >= 0 &&need[*customer_num][1] >= 0 && need[*customer_num][2]  >= 0){
+			
+			available[0] = need[*customer_num][0];
+			available[1] = need[*customer_num][1];
+			available[2] = need[*customer_num][2];
+			printf("\n\n\nBanker grants the resources\n\n\n");
+		}
+	}
+	else
+	{
+		need[*customer_num][0] = maximum[*customer_num][0]+allocation[*customer_num][0];
+		need[*customer_num][1] = maximum[*customer_num][1]+allocation[*customer_num][1];
+		need[*customer_num][2] = maximum[*customer_num][2]+allocation[*customer_num][2];
+		printf("\n\n\n\n\n***************fail***************\n\n\n\n\n");
 	}
 	//exit(0);
+}
+
+int release_resources(int *customer_num)
+{
+	available[0] += need[*customer_num][0];
+	available[1] += need[*customer_num][1];
+	available[2] += need[*customer_num][2];
+	
+	need[*customer_num][0] = 0;
+	need[*customer_num][1] = 0;
+	need[*customer_num][2] = 0;
 }
 
