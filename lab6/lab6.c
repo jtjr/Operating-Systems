@@ -106,11 +106,20 @@ int request_resources(int *customer_num, int request1,int request2,int request3)
 		if(need[*customer_num][0] >= 0 &&need[*customer_num][1] >= 0 && need[*customer_num][2]  >= 0){
 			printf("\n\n\nBanker grants the resources\n\n");
 		}
+		else{
+		allocation[*customer_num][0] = 0;
+		allocation[*customer_num][1] = 0;
+		allocation[*customer_num][2] = 0;		
+		need[*customer_num][0] = maximum[*customer_num][0]+allocation[*customer_num][0];
+		need[*customer_num][1] = maximum[*customer_num][1]+allocation[*customer_num][1];
+		need[*customer_num][2] = maximum[*customer_num][2]+allocation[*customer_num][2];
+		printf("\n\n\n***************fail***************\n\n\n");
+	}
 	}
 	else{
-		allocation[*customer_num][0] -= request1;
-		allocation[*customer_num][1] -= request2;
-		allocation[*customer_num][2] -= request3;		
+		allocation[*customer_num][0] = 0;
+		allocation[*customer_num][1] = 0;
+		allocation[*customer_num][2] = 0;		
 		need[*customer_num][0] = maximum[*customer_num][0]+allocation[*customer_num][0];
 		need[*customer_num][1] = maximum[*customer_num][1]+allocation[*customer_num][1];
 		need[*customer_num][2] = maximum[*customer_num][2]+allocation[*customer_num][2];
