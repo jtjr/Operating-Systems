@@ -1,3 +1,18 @@
+/*Lab 6 Banker Algorithm
+ * Russell Tan 
+ * 011529945
+ * 
+ * Jose Terrones Jr.
+ * 010178556
+ * 
+ * Grade given A+
+ * 
+ */
+
+
+
+
+
 #include <pthread.h>
 #include <time.h>
 #include <stdio.h>
@@ -19,6 +34,7 @@ int resources3;
 pthread_mutex_t mutex;
 void *customer(int *param);
 void printMatrices();
+int checkSafety();
 
 int main(int argc, char *argv[]){
 	srand (time(NULL));
@@ -64,18 +80,16 @@ void *customer(int *param){
 	while(i<3){
 		sleep(rand() % 3);
 		pthread_mutex_lock(&mutex);
-		printf("\n\ncustomer %3d\n_________________________\n ", *param);
-		int request1 = rand()%resources1;
-		int request2 = rand()%resources2;
-		int request3 = rand()%resources3;
-		//printf("requests %3d %3d %3d\n",request1,request2,request3);
+		printf("\ncustomer %3d\n_________________________\n ", *param);
+		int request1 = rand()%((int)maximum[*param][0]+1);
+		int request2 = rand()%((int)maximum[*param][1]+1);
+		int request3 = rand()%((int)maximum[*param][2]+1);
 		printMatrices();
 		request_resources(param,request1,request2,request3);
 		i++;
 		pthread_mutex_unlock(&mutex);
-	//pthread_exit(0);
 	}
-	//release_resources(param);
+	release_resources(param);
 }
 int request_resources(int *customer_num, int request1,int request2,int request3){
 	
@@ -88,35 +102,29 @@ int request_resources(int *customer_num, int request1,int request2,int request3)
 	need[*customer_num][1] = maximum[*customer_num][1]-allocation[*customer_num][1];
 	need[*customer_num][2] = maximum[*customer_num][2]-allocation[*customer_num][2];
 	printf("\n\t\tneed is %3d  %3d  %3d\n", need[*customer_num][0],need[*customer_num][1],need[*customer_num][2]);
-	/*if(need[*customer_num][0] <= available[0] &&need[*customer_num][1] <= available[1] && need[*customer_num][2] <= available[2]){
-		printf("\n\n\nBanker grants the resources\n\n\n");
-	}
-	else
-	{
-		printf("\n\n\n\n\nfail");
-		need[*customer_num][0] = maximum[*customer_num][0]+allocation[*customer_num][0];
-		need[*customer_num][1] = maximum[*customer_num][1]+allocation[*customer_num][1];
-		need[*customer_num][2] = maximum[*customer_num][2]+allocation[*customer_num][2];
-	}
-	* */
 	
-	if(request1 <= available[0] && request2 <= available[0] && request3 <= available[0]){
-		if(request1 <= need[*customer_num][0] && request2 <= need[*customer_num][1] && request3 <= need[*customer_num][2]){
-			printf("\n\n\nBanker grants the resources\n\n");
-			available[0] -= request1;
-			available[1] -= request2;
-			available[2] -= request3;
-			allocation[*customer_num][0] += request1;
-			allocation[*customer_num][1] += request2;
-			allocation[*customer_num][2] += request3;	
-			need[*customer_num][0] -= request1;
-			need[*customer_num][1] -= request2;
-			need[*customer_num][2] -= request3;
+		if(request1 <= available[0] && request2 <= available[0] && request3 <= available[0]){
+			if(request1 <= need[*customer_num][0] && request2 <= need[*customer_num][1] && request3 <= need[*customer_num][2]){
+				if(checkSafety())
+				{
+					printf("\n\nBanker grants the resources\n\n");
+					available[0] = available[0] - request1;
+					available[1] = available[1] - request2;
+					available[2] = available[2] - request3;
+					allocation[*customer_num][0]=allocation[*customer_num][0]+request1;
+					allocation[*customer_num][1]=allocation[*customer_num][1]+request2;
+					allocation[*customer_num][2]=allocation[*customer_num][2]+request3;
+					need[*customer_num][0]=need[*customer_num][0]-request1;
+					need[*customer_num][1]=need[*customer_num][1]-request2;
+					need[*customer_num][2]=need[*customer_num][2]-request3;
+				}
+			}
+		
+			else{
+				printf("\n\n***************fail***************\n\n");
+			}
 		}
-		else{
-		printf("\n\n\n***************fail***************\n\n\n");
-	}
-	}
+	
 	else{
 		allocation[*customer_num][0] = 0;
 		allocation[*customer_num][1] = 0;
@@ -124,20 +132,30 @@ int request_resources(int *customer_num, int request1,int request2,int request3)
 		need[*customer_num][0] = maximum[*customer_num][0]+allocation[*customer_num][0];
 		need[*customer_num][1] = maximum[*customer_num][1]+allocation[*customer_num][1];
 		need[*customer_num][2] = maximum[*customer_num][2]+allocation[*customer_num][2];
-		printf("\n\n\n***************fail***************\n\n\n");
+		printf("\n\n***************fail***************\n\n");
 	}
-	//exit(0);
 }
 
 int release_resources(int *customer_num)
 {
-	allocation[*customer_num][0] -= need[*customer_num][0];
-	allocation[*customer_num][1] -= need[*customer_num][1];
-	allocation[*customer_num][2] -= need[*customer_num][2];
+
+		available[0] += allocation[*customer_num][0];
+		available[1] += allocation[*customer_num][1];
+		available[2] += allocation[*customer_num][2];
+		
+		allocation[*customer_num][0] = 0;
+		allocation[*customer_num][1] = 0;
+		allocation[*customer_num][2] = 0;
+		
+		need[*customer_num][0] = 0;
+		need[*customer_num][1] = 0;
+		need[*customer_num][2] = 0;
+		maximum[*customer_num][0] = 0;
+		maximum[*customer_num][1] = 0;
+		maximum[*customer_num][2] = 0;
 	
-	need[*customer_num][0] = 0;
-	need[*customer_num][1] = 0;
-	need[*customer_num][2] = 0;
+	printf("RELEASING %2d\n",*customer_num);
+	printMatrices();
 }
 
 void printMatrices()
@@ -148,7 +166,7 @@ void printMatrices()
 	{
 		for(m = 0; m < 3; m++)
 		{
-			printf("%2d",allocation[k][m]);
+			printf("%4d",allocation[k][m]);
 		}
 		printf("\n");
 	}
@@ -157,7 +175,7 @@ void printMatrices()
 	{
 		for(m = 0; m < 3; m++)
 		{
-			printf("%2d",need[k][m]);
+			printf("%4d",need[k][m]);
 		}
 		printf("\n");
 	}
@@ -166,9 +184,54 @@ void printMatrices()
 	{
 		for(m = 0; m < 3; m++)
 		{
-			printf("%2d",maximum[k][m]);
+			printf("%4d",maximum[k][m]);
 		}
 		printf("\n");
 	}
+}
+
+int checkSafety()
+{
+	int boolean = 0;
+	int k,m,n;
+	int work[3] = {available[0],available[1],available[2]};
+	int finish[3] = {0,0,0};
+	
+	for(k = 0; k < 5; k++)
+	{
+		for(n = 0; n < 3; n++)
+		{
+			if(finish[n] == 0)
+			{
+				if(need[k][n] <= work[n])
+				{
+					work[n] += allocation[k][n];
+					finish[n] = 1;
+				}
+				else
+				{
+				
+					boolean = 0;
+					break;
+						
+				}
+			}	
+			else
+			{
+				for(m = 0; m < 3; m++)
+				{
+					boolean = 1;
+					if(finish[m] == 0)
+					{
+						printf(".");
+						boolean = 0;
+						break;
+					}
+				}
+			
+			}
+		}
+	}
+	return(boolean);
 }
 
